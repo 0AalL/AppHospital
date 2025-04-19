@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const app = express();
+const cookieParser = require('cookie-parser');
 
+const app = express();
+app.use(cookieParser());
 // Admin routes
 const adminAuthRoutes = require('./auth/auth.routes');
 const adminMedicoRoutes = require('./medico/medico.routes');

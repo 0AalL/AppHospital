@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
+const crypto = require('crypto'); // Para generar un token único y seguro
 
 exports.login = (req, res) => {
   const { username, password } = req.body;
@@ -21,11 +21,29 @@ exports.login = (req, res) => {
 
       if (!match) return res.status(401).json({ message: 'Contraseña incorrecta' });
 
-      // Generamos el token JWT
-      const token = jwt.sign({ id: user.id }, 'SECRET_KEY', { expiresIn: '1h' });
+      // Generamos un token único para la sesión (no JWT)
+      const sessionToken = crypto.randomBytes(64).toString('hex');
 
-      // Respondemos con el token generado
-      res.json({ token });
+      // Guardamos el token de sesión en la base de datos
+      db.query('INSERT INTO sesiones (user_id, token) VALUES (?, ?)', [user.id, sessionToken], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        // Respondemos con el token de sesión
+        res.json({ message: 'Sesión iniciada correctamente', sessionToken });
+      });
     });
+  });
+};
+
+exports.logout = (req, res) => {
+  const { sessionToken } = req.body; // El token de sesión debe venir del cliente (por ejemplo, en cookies o headers)
+
+  if (!sessionToken) return res.status(400).json({ message: 'No hay sesión activa' });
+
+  // Eliminamos la sesión de la base de datos
+  db.query('DELETE FROM sesiones WHERE token = ?', [sessionToken], (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    res.json({ message: 'Sesión cerrada correctamente' });
   });
 };

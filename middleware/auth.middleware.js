@@ -1,20 +1,24 @@
-const jwt = require('jsonwebtoken');
+const db = require('../config/db');
 
 module.exports = (req, res, next) => {
-  // Obtenemos el token de la cabecera 'Authorization'
-  const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
+  // Obtenemos el token de sesión de los headers
+  const sessionToken = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
 
-  if (!token) {
-    return res.status(403).json({ message: 'Token no proporcionado' });
+  if (!sessionToken) {
+    return res.status(403).json({ message: 'Token de sesión no proporcionado' });
   }
 
-  // Verificar el token
-  jwt.verify(token, 'SECRET_KEY', (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Token inválido' });
+  // Consultamos la base de datos para verificar si el token de sesión es válido
+  db.query('SELECT * FROM sesiones WHERE token = ?', [sessionToken], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    // Si no se encuentra la sesión en la base de datos
+    if (results.length === 0) {
+      return res.status(401).json({ message: 'Token de sesión inválido o caducado' });
     }
 
-    req.userId = decoded.id;  // Decodificamos el token y guardamos el id del usuario
+    // Si la sesión es válida, pasamos al siguiente middleware o controlador
+    req.userId = results[0].user_id; // Guardamos el ID del usuario asociado a la sesión
     next();
   });
 };
