@@ -1,0 +1,12 @@
+const express = require('express');
+const router = express.Router();
+const controller = require('./consulta.controller');
+const auth = require('../middleware/auth.middleware');
+
+router.post('/', auth, controller.createConsulta);
+router.get('/', auth, controller.getAllConsultas);
+router.get('/:id', auth, controller.getConsultaById);
+router.put('/:id', auth, controller.updateConsulta);
+router.delete('/:id', auth, controller.deleteConsulta);
+
+module.exports = router;
