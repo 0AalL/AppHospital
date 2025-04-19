@@ -16,10 +16,20 @@ exports.getAllConsultas = (req, res) => {
   });
 };
 
-exports.getConsultaById = (req, res) => {
-  db.query('SELECT * FROM consulta WHERE id = ?', [req.params.id], (err, results) => {
+exports.getConsultasByMedico = (req, res) => {
+  const medicoId = req.params.medico_id;
+  db.query('SELECT * FROM consulta WHERE medico_id = ?', [medicoId], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(results[0]);
+    res.json(results);
+  });
+};
+
+// Obtener las consultas de un paciente específico
+exports.getConsultasByPaciente = (req, res) => {
+  const pacienteId = req.params.paciente_id;
+  db.query('SELECT * FROM consulta WHERE paciente_id = ?', [pacienteId], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
   });
 };
 
