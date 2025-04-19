@@ -12,6 +12,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      cedula: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
       puesto: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -39,6 +44,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('empleados');
+    
   },
 };
