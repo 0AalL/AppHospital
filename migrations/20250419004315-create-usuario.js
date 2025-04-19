@@ -1,15 +1,12 @@
-// migrations/xxxxxx-create-usuario.js
 const bcrypt = require('bcryptjs');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Hashear la contraseña "1234"
     const hashedPassword = await bcrypt.hash('1234', 10);
 
-    // Crear la tabla de usuarios
     await queryInterface.createTable('usuarios', {
       id: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.INTEGER, // ← cambiado de BIGINT a INTEGER
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
@@ -39,7 +36,6 @@ module.exports = {
       },
     });
 
-    // Insertar un usuario con la contraseña hasheada "1234"
     await queryInterface.bulkInsert('usuarios', [
       {
         nombre_usuario: 'admin',
@@ -55,4 +51,3 @@ module.exports = {
     await queryInterface.dropTable('usuarios');
   },
 };
-

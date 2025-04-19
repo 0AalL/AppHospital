@@ -36,14 +36,20 @@ exports.login = (req, res) => {
 };
 
 exports.logout = (req, res) => {
-  const { sessionToken } = req.body; // El token de sesión debe venir del cliente (por ejemplo, en cookies o headers)
+  const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
 
-  if (!sessionToken) return res.status(400).json({ message: 'No hay sesión activa' });
+  if (!token) {
+    return res.status(400).json({ message: 'Token no proporcionado' });
+  }
 
-  // Eliminamos la sesión de la base de datos
-  db.query('DELETE FROM sesiones WHERE token = ?', [sessionToken], (err) => {
+  // Eliminamos el token de la base de datos
+  db.query('DELETE FROM sesiones WHERE token = ?', [token], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    res.json({ message: 'Sesión cerrada correctamente' });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Sesión no encontrada o ya cerrada' });
+    }
+
+    res.json({ message: 'Sesión cerrada exitosamente' });
   });
 };
