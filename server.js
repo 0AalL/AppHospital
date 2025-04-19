@@ -14,10 +14,7 @@ const jwtMiddleware = require('./middleware/auth.middleware');
 
 app.use(bodyParser.json());
 
-// Ruta de login que no necesita autenticación
 app.use('/admin/login', adminAuthRoutes);
-
-// Rutas protegidas que requieren autenticación JWT
 app.use('/admin/medicos', jwtMiddleware, adminMedicoRoutes);
 app.use('/admin/pacientes', jwtMiddleware, adminPacienteRoutes);
 app.use('/admin/consultas', jwtMiddleware, adminConsultaRoutes);
