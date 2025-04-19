@@ -5,7 +5,7 @@ const db = require('../config/db');
 exports.login = (req, res) => {
   const { username, password } = req.body;
 
-  db.query('SELECT * FROM empleados WHERE username = ?', [username], (err, results) => {
+  db.query('SELECT * FROM usuarios WHERE nombre_usuario = ?', [username], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
 
     if (results.length === 0) {
@@ -14,7 +14,7 @@ exports.login = (req, res) => {
 
     const user = results[0];
 
-    bcrypt.compare(password, user.password, (err, match) => {
+    bcrypt.compare(password, user.contrasena , (err, match) => {
       if (!match) return res.status(401).json({ message: 'Contraseña incorrecta' });
 
       const token = jwt.sign({ id: user.id }, 'SECRET_KEY', { expiresIn: '1h' });
