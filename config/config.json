@@ -1,9 +1,10 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
-    "database": "database_development",
+    "username": "safebryan",
+    "password": "081012",
+    "database": "consultas_medicas",
     "host": "127.0.0.1",
+    "port": 3308,
     "dialect": "mysql"
   },
   "test": {
