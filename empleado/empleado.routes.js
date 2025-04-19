@@ -5,8 +5,8 @@ const auth = require('../middleware/auth.middleware');
 
 router.post('/', auth, controller.createEmpleado);
 router.get('/', auth, controller.getAllEmpleados);
-router.get('/:id', auth, controller.getEmpleadoById);
-router.put('/:id', auth, controller.updateEmpleado);
-router.delete('/:id', auth, controller.deleteEmpleado);
+router.get('/:cedula', auth, controller.getEmpleadoById);
+router.put('/:cedula', auth, controller.updateEmpleado);
+router.delete('/:cedula', auth, controller.deleteEmpleado);
 
 module.exports = router;

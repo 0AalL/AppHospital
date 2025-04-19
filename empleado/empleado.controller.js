@@ -1,96 +1,62 @@
-const db = require('../config/db');
-const bcrypt = require('bcrypt');
+// controllers/empleadoController.js
+const db = require('../config/db');  // Conexión a la base de datos
 
-const createEmpleado = async (req, res) => {
-    try {
-        const { nombre, puesto, correo, telefono, contrasena, centro_id } = req.body;
-
-        const hashedPassword = await bcrypt.hash(contrasena, 10);
-
-        const [result] = await db.query(
-            `INSERT INTO empleado (nombre, puesto, correo, telefono, contrasena, centro_id)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [nombre, puesto, correo, telefono, hashedPassword, centro_id]
-        );
-
-        res.status(201).json({ id: result.insertId, message: 'Empleado creado' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al crear empleado' });
-    }
-};
-
-const getAllEmpleados = async (req, res) => {
-    try {
-        const [rows] = await db.query('SELECT id, nombre, puesto, correo, telefono, centro_id FROM empleado');
-        res.json(rows);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al obtener empleados' });
-    }
-};
-
-const getEmpleadoById = async (req, res) => {
-    try {
-        const [rows] = await db.query('SELECT id, nombre, puesto, correo, telefono, centro_id FROM empleado WHERE id = ?', [req.params.id]);
-        if (rows.length === 0) {
-            return res.status(404).json({ error: 'Empleado no encontrado' });
+// GET: Obtener todos los empleados
+exports.getAllEmpleados = (req, res) => {
+    db.query('SELECT * FROM empleados', (err, results) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error fetching empleados', error: err });
         }
-        res.json(rows[0]);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al obtener empleado' });
-    }
+        res.json(results);
+    });
 };
 
-const updateEmpleado = async (req, res) => {
-    try {
-        const { nombre, puesto, correo, telefono, contrasena, centro_id } = req.body;
-
-        let updateQuery = `UPDATE empleado SET nombre = ?, puesto = ?, correo = ?, telefono = ?, centro_id = ?`;
-        const params = [nombre, puesto, correo, telefono, centro_id];
-
-        if (contrasena) {
-            const hashedPassword = await bcrypt.hash(contrasena, 10);
-            updateQuery += `, contrasena = ?`;
-            params.push(hashedPassword);
+// GET: Obtener empleado por cédula (id)
+exports.getEmpleadoById = (req, res) => {
+    const { id } = req.params;
+    db.query('SELECT * FROM empleados WHERE cedula = ?', [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error fetching empleado', error: err });
         }
-
-        updateQuery += ` WHERE id = ?`;
-        params.push(req.params.id);
-
-        const [result] = await db.query(updateQuery, params);
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Empleado no encontrado' });
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Empleado not found' });
         }
-
-        res.json({ message: 'Empleado actualizado' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al actualizar empleado' });
-    }
+        res.json(result);
+    });
 };
 
-const deleteEmpleado = async (req, res) => {
-    try {
-        const [result] = await db.query('DELETE FROM empleado WHERE id = ?', [req.params.id]);
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Empleado no encontrado' });
-        }
-
-        res.json({ message: 'Empleado eliminado' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al eliminar empleado' });
-    }
+// POST: Crear un nuevo empleado
+exports.createEmpleado = (req, res) => {
+    const { nombre, cedula, puesto, correo, telefono } = req.body;
+    db.query('INSERT INTO empleados (nombre, cedula, puesto, correo, telefono) VALUES (?, ?, ?, ?, ?)',
+        [nombre, cedula, puesto, correo, telefono], (err, result) => {
+            if (err) {
+                return res.status(500).json({ message: 'Error creating empleado', error: err });
+            }
+            res.status(201).json({ message: 'Empleado created', id: result.insertId });
+        });
 };
 
-module.exports = {
-    createEmpleado,
-    getAllEmpleados,
-    getEmpleadoById,
-    updateEmpleado,
-    deleteEmpleado
+// PUT: Actualizar un empleado por cédula (id)
+exports.updateEmpleado = (req, res) => {
+    const { id } = req.params;
+    const { nombre, puesto, correo, telefono } = req.body;
+    db.query('UPDATE empleados SET nombre = ?, puesto = ?, correo = ?, telefono = ? WHERE cedula = ?',
+        [nombre, puesto, correo, telefono, id], (err, result) => {
+            if (err) {
+                return res.status(500).json({ message: 'Error updating empleado', error: err });
+            }
+            res.json({ message: 'Empleado updated' });
+        });
+};
+
+// DELETE: Eliminar un empleado por cédula (id)
+exports.deleteEmpleado = (req, res) => {
+    const { id } = req.params;
+    db.query('DELETE FROM empleados WHERE cedula = ?', [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error deleting empleado', error: err });
+        }
+        res.json({ message: 'Empleado deleted' });
+    });
 };

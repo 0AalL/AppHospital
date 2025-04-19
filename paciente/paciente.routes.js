@@ -5,8 +5,8 @@ const auth = require('../middleware/auth.middleware');
 
 router.post('/', auth, controller.createPaciente);
 router.get('/', auth, controller.getAllPacientes);
-router.get('/:id', auth, controller.getPacienteById);
-router.put('/:id', auth, controller.updatePaciente);
-router.delete('/:id', auth, controller.deletePaciente);
+router.get('/:cedula', auth, controller.getPacienteById);
+router.put('/:cedula', auth, controller.updatePaciente);
+router.delete('/:cedula', auth, controller.deletePaciente);
 
 module.exports = router;

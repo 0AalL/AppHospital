@@ -5,8 +5,8 @@ const auth = require('../middleware/auth.middleware');
 
 router.post('/', auth, controller.createMedico);
 router.get('/', auth, controller.getAllMedicos);
-router.get('/:id', auth, controller.getMedicoById);
-router.put('/:id', auth, controller.updateMedico);
-router.delete('/:id', auth, controller.deleteMedico);
+router.get('/:cedula', auth, controller.getMedicoById);
+router.put('/:cedula', auth, controller.updateMedico);
+router.delete('/:cedula', auth, controller.deleteMedico);
 
 module.exports = router;
