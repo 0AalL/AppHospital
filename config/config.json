@@ -3,8 +3,8 @@
     "username": "safebryan",
     "password": "081012",
     "database": "consultas_medicas",
-    "host": "127.0.0.1",
-    "port": 3308,
+    "host": "192.168.100.2",
+    "port": 3306,
     "dialect": "mysql"
   },
   "test": {
